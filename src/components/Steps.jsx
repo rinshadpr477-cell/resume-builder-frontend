@@ -13,7 +13,7 @@ import Swal from 'sweetalert2'
 
 const steps = ['Basic Informations', 'Contact Details', 'Education Details', 'Work Experience', 'Skills & Certifications', 'Review & Submit'];
 
-function Steps({ userInput, setUserInput, setFinish,setResumeId }) {
+function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
 
     const skillSuggestionArray = ['JavaScript', 'React', 'Node.js', 'Python', 'Machine Learning', 'Communication', 'Problem Solving',];
     const [activeStep, setActiveStep] = React.useState(0);
@@ -99,10 +99,10 @@ function Steps({ userInput, setUserInput, setFinish,setResumeId }) {
                     <h3>Contact Details</h3>
                     <div className='d-flex flex-column gap-3 mt-4'>
                         <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, Email: e.target.value } })} id="standard-Email" label="Email" variant="standard" value={userInput.personalData.Email} />
-                        <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, PhoneNumber: e.target.value } })} id="standard-PhoneNumber" label="Phone Number" variant="standard" value={userInput.personalData.PhoneNumber}/>
+                        <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, PhoneNumber: e.target.value } })} id="standard-PhoneNumber" label="Phone Number" variant="standard" value={userInput.personalData.PhoneNumber} />
                         <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, GitHubLink: e.target.value } })} id="standard-GitHubLink" label="GitHub Link" variant="standard" value={userInput.personalData.GitHubLink} />
                         <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, LinkedinProfileLink: e.target.value } })} id="standard-LinkedinProfileLink" label="Linkedin Profile Link" variant="standard" value={userInput.personalData.LinkedinProfileLink} />
-                        <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, Portfoliolink: e.target.value } })} id="standard-Portfoliolink" label="Portfolio link" variant="standard" value={userInput.personalData.Portfoliolink}  />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, Portfoliolink: e.target.value } })} id="standard-Portfoliolink" label="Portfolio link" variant="standard" value={userInput.personalData.Portfoliolink} />
                     </div>
                 </div>
             )
@@ -111,10 +111,10 @@ function Steps({ userInput, setUserInput, setFinish,setResumeId }) {
                 <div>
                     <h3>Education Details</h3>
                     <div className='d-flex flex-column gap-3 mt-4'>
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, course: e.target.value } })} id="standard-course" label="Course" variant="standard" value={userInput.education.course} />
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, college: e.target.value } })} id="standard-college" label="College" variant="standard" value={userInput.education.college} />
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, University: e.target.value } })} id="standard-university" label="University" variant="standard" value={userInput.education.University} />
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, Year: e.target.value } })} id="standard-passout" label="Year Of Passout" variant="standard" value={userInput.education.Year} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, course: e.target.value } })} id="standard-course" label="Course" variant="standard" value={userInput.education.course} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, college: e.target.value } })} id="standard-college" label="College" variant="standard" value={userInput.education.college} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, University: e.target.value } })} id="standard-university" label="University" variant="standard" value={userInput.education.University} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, Year: e.target.value } })} id="standard-passout" label="Year Of Passout" variant="standard" value={userInput.education.Year} />
                     </div>
                 </div>
             )
@@ -123,10 +123,10 @@ function Steps({ userInput, setUserInput, setFinish,setResumeId }) {
                 <div>
                     <h3>Professional Details</h3>
                     <div className='d-flex flex-column gap-3 mt-4'>
-                                  <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, jobRole: e.target.value } })} id="standard-job" label="Job or Internships" variant="standard" value={userInput.experience.jobRole} />
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, company: e.target.value } })} id="standard-company" label="Company" variant="standard" value={userInput.experience.company} />
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, joblocation: e.target.value } })} id="standard-loc" label="Location" variant="standard" value={userInput.experience.joblocation} />
-                                   <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, duration: e.target.value } })} id="standard-duration" label="Duration" variant="standard" value={userInput.experience.duration} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, jobRole: e.target.value } })} id="standard-job" label="Job or Internships" variant="standard" value={userInput.experience.jobRole} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, company: e.target.value } })} id="standard-company" label="Company" variant="standard" value={userInput.experience.company} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, joblocation: e.target.value } })} id="standard-loc" label="Location" variant="standard" value={userInput.experience.joblocation} />
+                        <TextField onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, duration: e.target.value } })} id="standard-duration" label="Duration" variant="standard" value={userInput.experience.duration} />
                     </div>
                 </div>
             )
