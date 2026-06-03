@@ -3,8 +3,7 @@
 A modern Resume Builder web application that allows users to create, customize, preview, and download professional resumes with ease.
 
 🌐 Live Demo
-
-Frontend: Resume Builder Live Demo
+Frontend: https://resume-builder-frontend-teal.vercel.app/
 
 ##  Features
 * Create professional resumes
