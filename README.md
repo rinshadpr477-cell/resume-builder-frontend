@@ -2,6 +2,10 @@
 
 A modern Resume Builder web application that allows users to create, customize, preview, and download professional resumes with ease.
 
+🌐 Live Demo
+
+Frontend: Resume Builder Live Demo
+
 ##  Features
 * Create professional resumes
 * Add personal details, education, skills, and experience
