@@ -38,7 +38,6 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
             newSkipped = new Set(newSkipped.values());
             newSkipped.delete(activeStep);
         }
-
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setSkipped(newSkipped);
     };
@@ -51,7 +50,6 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
         if (!isStepOptional(activeStep)) {
             throw new Error("You can't skip a step that isn't optional.");
         }
-
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setSkipped((prevSkipped) => {
             const newSkipped = new Set(prevSkipped.values());
@@ -73,7 +71,6 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
                 setUserInput({ ...userInput, skills: [...userInput.skills, inputSkill.toLowerCase()] })
             }
         }
-
     }
 
     const removeSkill = (skill) => {
@@ -150,7 +147,6 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
                     <div className='d-flex flex-wrap justify-content-start align-items-center mt-3 gap-1'>
                         {
                             userInput.skills.length > 0 &&
-
                             userInput.skills.map(skill => (
 
                                 <span key={skill} className='btn btn-primary text-light'>{skill} <button className='btn text-light' onClick={() => removeSkill(skill)} >x</button></span>
@@ -159,10 +155,8 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
                             )
                         }
 
-
                     </div>
                 </div>
-
             )
             case 5:
                 return (
@@ -182,45 +176,29 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
     const handleAddResume = async () => {
         const { FullName, jobTitle, location } = userInput.personalData
         if (FullName && jobTitle && location) {
-
             try {
                 const result = await addResumeAPI(userInput)
                 console.log(result);
                 if (result.status >= 200 && result.status < 300) {
                     setResumeId(result?.data?.id)
-                    Swal.fire({
-                        title: 'success!',
-                        text: 'Resume Generated',
-                        icon: 'success',
+                    Swal.fire({title: 'success!',text: 'Resume Generated',icon: 'success',
                     });
-
                     setFinish(true)
-
                 }
                 else {
                     setFinish(false)
-                    Swal.fire({
-                        title: 'Error!!',
-                        text: 'Resume Added Failed',
-                        icon: 'error',
-
+                    Swal.fire({title: 'Error!!',text: 'Resume Added Failed',icon: 'error',
                     });
                 }
             }
-
             catch (err) {
                 console.log(err);
-
             }
         }
         else {
             alert("enter complete information")
         }
-
     }
-
-
-
 
     return (
         <div>
@@ -256,7 +234,7 @@ function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
                     <Box sx={{ flex: '1 1 auto' }} />
 
                     {
-                        activeStep === steps.length - 1 ?                   // adding for api
+                        activeStep === steps.length - 1 ?                   
                             <Button onClick={handleAddResume}>FINISH</Button> :
                             <Button onClick={handleNext}>NEXT</Button>
                     }

@@ -1,10 +1,6 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
+import { Box, Button, Typography, Modal, TextField, CircularProgress, Stack,Chip} from '@mui/material';
 import { FaEdit } from "react-icons/fa";
-import { TextField } from '@mui/material';
 import { editResumeAPI, getResumeAPI } from '../services/allAPI';
 import Swal from 'sweetalert2';
 
@@ -13,250 +9,183 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
-  maxHeight: '80vh',
+  width: { xs: '95%', sm: 600 },
+  maxHeight: '85vh',
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  borderRadius: 3,
   boxShadow: 24,
-  p: 4,
+  p: 3,
   overflowY: 'auto'
 };
 
-function Edit({ resumeId ,setUpdateduserinput }) {
+const emptyState = {
+  personalData: {},
+  education: {},
+  experience: {},
+  skills: [],
+  summary: ""
+};
+
+function Edit({ resumeId, setUpdateduserinput }) {
 
   const [open, setOpen] = React.useState(false);
-  const inputRef = React.useRef();
+  const [loading, setLoading] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [skillInput, setSkillInput] = React.useState("");
+  const [userInput, setUserInput] = React.useState(emptyState);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const [userInput, setUserInput] = React.useState({});
-
+ 
   const getResume = async () => {
+    if (!resumeId) return;
     try {
+      setLoading(true);
       const result = await getResumeAPI(resumeId);
-      console.log(result);
-      setUserInput(result?.data || {});
+      setUserInput(result?.data || emptyState);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to load resume", "error");
+    } finally {
+      setLoading(false);
     }
-    catch (err) {
-      console.log(err);
-    }
-  }
+  };
 
   React.useEffect(() => {
-    getResume();
-  }, [])
+    if (open) getResume();
+  }, [open, resumeId]);
 
-  const addSkill = (inputSkill) => {
-    let skill = inputSkill.current.value
-    if (skill) {
-      if (userInput.skills?.includes(skill.toLowerCase())) {
-        alert("skill already added")
+
+  const updateNested = (section, field, value) => {
+    setUserInput(prev => ({
+      ...prev,
+      [section]: {
+        ...prev?.[section],
+        [field]: value
       }
-      else {
-        setUserInput({ ...userInput, skills: [...(userInput.skills || []), skill.toLowerCase()] })
+    }));
+  };
+
+
+  const addSkill = () => {
+    const skill = skillInput.trim().toLowerCase();
+    if (!skill) return;
+    setUserInput(prev => {
+      const skills = prev.skills || [];
+      if (skills.includes(skill)) {
+        Swal.fire("Oops", "Skill already added", "info");
+        return prev;
       }
-      inputSkill.current.value = ""
-    }
-  }
+      return { ...prev, skills: [...skills, skill] };
+    });
+    setSkillInput("");
+  };
 
   const removeSkill = (skill) => {
-    setUserInput({ ...userInput, skills: userInput.skills.filter(sk => sk != skill) })
-  }
+    setUserInput(prev => ({
+      ...prev,
+      skills: prev.skills.filter(s => s !== skill)
+    }));
+  };
 
- const updateResume = async () => {
+
+  const updateResume = async () => {
     try {
-
-      const result = await editResumeAPI(resumeId, userInput)
-      if (result.status >= 200 && result.status < 300) {
-
-        // ✅ FIXED (typo)
-        setUpdateduserinput(result?.data)
-
-        handleClose()
+      setSaving(true);
+      const result = await editResumeAPI(resumeId, userInput);
+      if (result?.status >= 200 && result?.status < 300) {
+        setUpdateduserinput(result?.data);
         Swal.fire({
-          title: "Success!!",
-          text: "Resume Updated Successfully",
+          title: "Updated!",
+          text: "Resume updated successfully",
           icon: "success"
         });
+        handleClose();
       }
-
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Update failed", "error");
+    } finally {
+      setSaving(false);
     }
-    catch (err) {
-      console.log(err);
+  };
 
-    }
-  }
-
+ 
   return (
     <div>
-      <button onClick={handleOpen} className='btn fs-3 text-primary'>
-        <FaEdit />
-      </button>
 
-      <Modal
-        open={open}
-        onClose={handleClose}
-      >
+      <Button onClick={handleOpen} variant="contained" color="primary" sx={{ borderRadius: 3, minWidth: 0 }}>
+        <FaEdit />
+      </Button>
+
+      <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
-          <Typography variant="h6">
-            Edit Details
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">Edit Resume</Typography>
+            {loading && <CircularProgress size={20} />}
+          </Stack>
+
+         
+          <Typography sx={{ mt: 2 }} variant="subtitle1">
+            Personal Details
           </Typography>
 
-          {/* ✅ FIXED: changed Typography -> Box */}
-          <Box sx={{ mt: 2 }}>
+          <Stack spacing={2} mt={1}>
+            <TextField  label="Full Name" value={userInput?.personalData?.FullName || ""}  onChange={(e) => updateNested("personalData", "FullName", e.target.value)} fullWidth />
+            <TextField label="Job Title" value={userInput?.personalData?.jobTitle || ""} onChange={(e) => updateNested("personalData", "jobTitle", e.target.value)} fullWidth />
+            <TextField label="Location" value={userInput?.personalData?.location || ""} onChange={(e) => updateNested("personalData", "location", e.target.value)}  fullWidth />
+          </Stack>
 
-            <h3>Personal Details</h3>
-            <div className='d-flex flex-column gap-3 mt-4'>
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, FullName: e.target.value } })}
-                label="Full Name"
-                variant="standard"
-                value={userInput.personalData?.FullName || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, jobTitle: e.target.value } })}
-                label="Job Title"
-                variant="standard"
-                value={userInput.personalData?.jobTitle || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, location: e.target.value } })}
-                label="Location"
-                variant="standard"
-                value={userInput.personalData?.location || ""}
-              />
-            </div>
+          <Typography sx={{ mt: 3 }} variant="subtitle1">
+            Contact
+          </Typography>
 
-            <h3>Contact Details</h3>
-            <div className='d-flex flex-column gap-3 mt-4'>
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, Email: e.target.value } })}
-                label="Email"
-                variant="standard"
-                value={userInput.personalData?.Email || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, PhoneNumber: e.target.value } })}
-                label="Phone Number"
-                variant="standard"
-                value={userInput.personalData?.PhoneNumber || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, GitHubLink: e.target.value } })}
-                label="GitHub Link"
-                variant="standard"
-                value={userInput.personalData?.GitHubLink || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, LinkedinProfileLink: e.target.value } })}
-                label="Linkedin Profile Link"
-                variant="standard"
-                value={userInput.personalData?.LinkedinProfileLink || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, personalData: { ...userInput.personalData, Portfoliolink: e.target.value } })}
-                label="Portfolio link"
-                variant="standard"
-                value={userInput.personalData?.Portfoliolink || ""}
-              />
-            </div>
+          <Stack spacing={2} mt={1}>
+            <TextField label="Email" value={userInput?.personalData?.Email || ""}onChange={(e) => updateNested("personalData", "Email", e.target.value)} fullWidth />
+            <TextField   label="Phone"  value={userInput?.personalData?.PhoneNumber || ""}  onChange={(e) => updateNested("personalData", "PhoneNumber", e.target.value)} fullWidth />
+          </Stack>
 
-            <h3>Education Details</h3>
-            <div className='d-flex flex-column gap-3 mt-4'>
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, course: e.target.value } })}
-                label="Course"
-                variant="standard"
-                value={userInput.education?.course || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, college: e.target.value } })}
-                label="College"
-                variant="standard"
-                value={userInput.education?.college || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, University: e.target.value } })}
-                label="University"
-                variant="standard"
-                value={userInput.education?.University || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, education: { ...userInput.education, Year: e.target.value } })}
-                label="Year Of Passout"
-                variant="standard"
-                value={userInput.education?.Year || ""}
-              />
-            </div>
+          
+          <Typography sx={{ mt: 3 }}>Skills</Typography>
 
-            <h3>Professional Details</h3>
-            <div className='d-flex flex-column gap-3 mt-4'>
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, jobRole: e.target.value } })}
-                label="Job or Internships"
-                variant="standard"
-                value={userInput.experience?.jobRole || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, company: e.target.value } })}
-                label="Company"
-                variant="standard"
-                value={userInput.experience?.company || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, joblocation: e.target.value } })}
-                label="Location"
-                variant="standard"
-                value={userInput.experience?.joblocation || ""}
-              />
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, experience: { ...userInput.experience, duration: e.target.value } })}
-                label="Duration"
-                variant="standard"
-                value={userInput.experience?.duration || ""}
-              />
-            </div>
+          <Stack direction="row" spacing={1} mt={1}>
+            <TextField value={skillInput} onChange={(e) => setSkillInput(e.target.value)} label="Add Skill" fullWidth />
+            <Button variant="contained" onClick={addSkill}>
+              Add
+            </Button>
+          </Stack>
 
-            <h3>Skills</h3>
-            <div className='mt-3 d-flex align-items-center justify-content-between'>
-              <TextField
-                inputRef={inputRef}
-                label="Add Skill"
-                variant="outlined"
-                sx={{ width: '100%' }}
+          <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
+            {userInput.skills?.map((skill) => (
+              <Chip
+                key={skill}
+                label={skill}
+                onDelete={() => removeSkill(skill)}
+                color="primary"
               />
-              <Button variant="contained" className='ms-3' onClick={() => addSkill(inputRef)}>ADD</Button>
-            </div>
+            ))}
+          </Stack>
 
-            <h5 className='mt-3'>Added Skills:</h5>
-            <div className='d-flex flex-wrap mt-3 gap-1'>
-              {
-                userInput.skills?.map(skill => (
-                  <span key={skill} className='btn btn-primary text-light'>
-                    {skill}
-                    <button className='btn text-light' onClick={() => removeSkill(skill)}>x</button>
-                  </span>
-                ))
-              }
-            </div>
+          {/* SUMMARY */}
+          <Typography sx={{ mt: 3 }}>Summary</Typography>
 
-            <h3 className='mt-3'>Professional Summary</h3>
-            <div className='mt-1 p-3 row'>
-              <TextField
-                onChange={(e) => setUserInput({ ...userInput, summary: e.target.value })}
-                label="Write a short summary of yourself"
-                variant="standard"
-                value={userInput.summary || ""}
-              />
-            </div>
+          <TextField  value={userInput.summary || ""} onChange={(e) => setUserInput({ ...userInput, summary: e.target.value })} fullWidth  multiline  rows={3} sx={{ mt: 1 }} />
 
-          </Box>
+          <Stack direction="row" justifyContent="flex-end" mt={4} spacing={2}>
+            <Button onClick={handleClose} disabled={saving}>
+              Cancel
+            </Button>
 
-          <button onClick={updateResume} className='text-primary'>Update</button>
+            <Button variant="contained"  onClick={updateResume} disabled={saving} >
+              {saving ? "Saving..." : "Update"}
+            </Button>
+          </Stack>
+
         </Box>
       </Modal>
     </div>
-  )
+  );
 }
 
 export default Edit;

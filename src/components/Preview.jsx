@@ -1,11 +1,13 @@
-import React from 'react'
+import React from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import { Divider } from '@mui/material';
+import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import { FaFileDownload, FaHistory } from "react-icons/fa";
-import { Link } from 'react-router-dom'
+import Chip from '@mui/material/Chip';
+
+import { FaFileDownload, FaHistory, FaArrowLeft } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 import Edit from './Edit';
 import jsPDF from 'jspdf';
 import { addHistoryAPI } from '../services/allAPI';
@@ -13,139 +15,115 @@ import html2canvas from 'html2canvas';
 
 function Preview({ userInput, finish, resumeId, setUserInput }) {
 
-  const [downloadstatus, setDownloadStatus] = React.useState(false)
+  const [downloadstatus, setDownloadStatus] = React.useState(false);
 
   const downloadCV = async () => {
     try {
-      const input = document.getElementById("result")
-      const canvas = await html2canvas(input, { scale: 1 })
-      const imgURL = canvas.toDataURL('image/png')
+      const input = document.getElementById("result");
+      const canvas = await html2canvas(input, {
+        scale: 2,
+        useCORS: true
+      });
+      const imgURL = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgURL, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("resume.pdf");
+      const timestamp = new Date().toLocaleString();
 
-      const pdf = new jsPDF()
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = pdf.internal.pageSize.getHeight()
+      const result = await addHistoryAPI({
+        ...userInput,
+        imgURL,
+        timestamp
+      });
 
-      pdf.addImage(imgURL, 'PNG', 0, 0, pdfWidth, pdfHeight)
-      pdf.save('resume.pdf')
-
-      const localTime = new Date()
-      const timestamp = `${localTime.toLocaleDateString()}, ${localTime.toLocaleTimeString()}`
-
-      try {
-        const result = await addHistoryAPI({ ...userInput, imgURL, timestamp })
-        if (result.status >= 200 && result.status < 300) {
-          setDownloadStatus(true)
-        }
-      } catch (err) {
-        console.log(err);
+      if (result?.status >= 200 && result?.status < 300) {
+        setDownloadStatus(true);
       }
-
     } catch (err) {
-      console.log("pdf generation failed", err);
+      console.log("PDF generation failed", err);
     }
-  }
+  };
+
+  const data = userInput || {};
+  if (!data?.personalData?.FullName) return null;
 
   return (
-    <>
-      {
-        userInput.personalData.FullName !== "" &&
-        <div style={{ marginTop: '70px' }}>
+    <Box sx={{ mt: { xs: 10, md: 12 }, px: { xs: 2, md: 6 } }}>
+      {finish && (
+        <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end", mb: 2, flexWrap: "wrap" }} >
+          <Button  onClick={downloadCV} variant="contained"  startIcon={<FaFileDownload />} sx={{ textTransform: "none", borderRadius: 2  }} >
+            Download
+          </Button>
 
-          {
-            finish &&
-            <Stack direction={'row'} sx={{ justifyContent: 'flex-end' }}>
-              
-              {/* download */}
-              <button onClick={downloadCV} className='btn fs-3 text-primary'>
-                <FaFileDownload />
-              </button>
+          {downloadstatus && (
+            <>
+              <Edit resumeId={resumeId} setUpdateduserinput={setUserInput} />
 
-              {
-                downloadstatus &&
-                <>
-                  {/* edit */}
-                  <Edit resumeId={resumeId} setUpdateduserinput={setUserInput} />
+              <Link to="/history">
+                <Button variant="outlined" startIcon={<FaHistory />} sx={{ textTransform: "none", borderRadius: 2 }} >
+                  History
+                </Button>
+              </Link>
+            </>
+          )}
 
-                  {/* history */}
-                  <Link to={'/history'} className='btn fs-3 text-primary'>
-                    <FaHistory />
-                  </Link>
-                </>
-              }
+          <Link to="/form">
+            <Button variant="text" startIcon={<FaArrowLeft />} sx={{ textTransform: "none" }} >
+              Back
+            </Button>
+          </Link>
 
-              {/* back */}
-              <Link to={'/form'} className='btn fs-5 text-primary'>Back</Link>
+        </Stack>
+      )}
+   
+      <Paper id="result" elevation={6}sx={{ p: { xs: 2, md: 4 },  borderRadius: 4,  maxWidth: "900px", margin: "auto", background: "#fff" }} >
+        <Box sx={{ textAlign: "center", mb: 2 }}>
+          <h2 style={{ margin: 0 }}>
+            {data.personalData?.FullName}
+          </h2>
+          <p style={{ margin: "5px 0", color: "#555" }}>
+            {data.personalData?.jobTitle}
+          </p>
+          <p style={{ fontSize: "14px", color: "#666" }}>
+            {data.personalData?.location} | {data.personalData?.Email} | {data.personalData?.PhoneNumber}
+          </p>
+        </Box>
+        <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2, flexWrap: "wrap" }}>
+          {data.personalData?.GitHubLink && (
+            <a href={data.personalData.GitHubLink} target="_blank">GitHub</a>
+          )}
+          {data.personalData?.LinkedinProfileLink && (
+            <a href={data.personalData.LinkedinProfileLink} target="_blank">LinkedIn</a>
+          )}
+          {data.personalData?.Portfoliolink && (
+            <a href={data.personalData.Portfoliolink} target="_blank">Portfolio</a>
+          )}
+        </Stack>
+        <Divider sx={{ my: 2 }}>SUMMARY</Divider>
+        <p style={{ fontSize: "15px", lineHeight: "1.6" }}>
+          {data.summary}
+        </p>
+        <Divider sx={{ my: 2 }}>EDUCATION</Divider>
+        <h4>{data.education?.course}</h4>
+        <p>
+          {data.education?.college} | {data.education?.University} | {data.education?.Year}
+        </p>
+        <Divider sx={{ my: 2 }}>EXPERIENCE</Divider>
+        <h4>{data.experience?.jobRole}</h4>
+        <p>
+          {data.experience?.company} | {data.experience?.joblocation} | {data.experience?.duration}
+        </p>
+        <Divider sx={{ my: 2 }}>SKILLS</Divider>
+        <Stack direction="row" spacing={1}  sx={{ flexWrap: "wrap",  gap: 1 }} >
+          {data.skills?.map((skill, i) => (
+            <Chip key={i}  label={skill} color="primary" variant="outlined" sx={{ mb: 1 }} />))}
+        </Stack>
 
-            </Stack>
-          }
-
-          <Box component="section">
-            <Paper elevation={3} sx={{ p: 3 }} id="result">
-
-              {/* PERSONAL */}
-              <h3>{userInput.personalData.FullName}</h3>
-              <h6>{userInput.personalData.jobTitle}</h6>
-
-              <p>
-                <span>{userInput.personalData.location}</span> |{" "}
-                <span>{userInput.personalData.Email}</span> |{" "}
-                <span>{userInput.personalData.PhoneNumber}</span>
-              </p>
-
-              <p>
-                {userInput.personalData.GitHubLink && (
-                  <a href={userInput.personalData.GitHubLink} target='_blank'>GitHub</a>
-                )}{" "}
-                {userInput.personalData.LinkedinProfileLink && (
-                  <a href={userInput.personalData.LinkedinProfileLink} target='_blank'>LinkedIn</a>
-                )}{" "}
-                {userInput.personalData.Portfoliolink && (
-                  <a href={userInput.personalData.Portfoliolink} target='_blank'>Portfolio</a>
-                )}
-              </p>
-
-              {/* SUMMARY */}
-              <Divider sx={{ fontSize: '23px' }}>SUMMARY</Divider>
-              <p className='fs-5 text-start'>{userInput.summary}</p>
-
-              {/* EDUCATION */}
-              <Divider sx={{ fontSize: '23px' }}>EDUCATION</Divider>
-              <h6 className='fs-5 text-start'>{userInput.education.course}</h6>
-
-              <p>
-                <span>{userInput.education.college}</span> |{" "}
-                <span>{userInput.education.University}</span> |{" "}
-                <span>{userInput.education.Year}</span>
-              </p>
-
-              {/* EXPERIENCE */}
-              <Divider sx={{ fontSize: '23px' }}>PROFESSIONAL EXPERIENCE</Divider>
-              <h6 className='fs-5 text-start'>{userInput.experience.jobRole}</h6>
-
-              <p>
-                <span>{userInput.experience.company}</span> |{" "}
-                <span>{userInput.experience.joblocation}</span> |{" "}
-                <span>{userInput.experience.duration}</span>
-              </p>
-
-              {/* SKILLS */}
-              <Divider sx={{ fontSize: '23px', marginBottom: '20px' }}>SKILLS</Divider>
-
-              <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: '10px' }}>
-                {
-                  userInput.skills.length > 0 &&
-                  userInput.skills.map((skill, index) => (
-                    <Button key={index} variant="contained">{skill}</Button>
-                  ))
-                }
-              </Stack>
-
-            </Paper>
-          </Box>
-        </div>
-      }
-    </>
-  )
+      </Paper>
+    </Box>
+  );
 }
 
-export default Preview
+export default Preview;

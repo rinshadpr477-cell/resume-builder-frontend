@@ -16,8 +16,6 @@ export const getResumeAPI=(resumeid)=>{
   return commonAPI("GET",`${BASEURL}/resume/${resumeid}`,{})
 }
 
-
-
 //HISTORY API
 
 export const addHistoryAPI=(resume)=>{
@@ -25,12 +23,6 @@ export const addHistoryAPI=(resume)=>{
   
   return commonAPI("POST",`${BASEURL}/history`,resume)
 }
-
-
-
-// ADDHISTORY API
-
-
 
 // GETHISTORYAPI
 export const getHistoryAPI=()=>{

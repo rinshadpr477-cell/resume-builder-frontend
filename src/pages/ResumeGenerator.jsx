@@ -1,44 +1,119 @@
-import React from 'react'
+import React from 'react';
 import { IoMdDocument } from "react-icons/io";
 import { IoIosDownload } from "react-icons/io";
 import { Link } from 'react-router-dom';
 
 function ResumeGenerator() {
+
+  const containerStyle = {
+    minHeight: "80vh",
+    padding: "100px 20px 60px",
+    background: "linear-gradient(180deg, #0b1220, #0f172a)",
+    color: "#fff",
+    fontFamily: "Poppins, sans-serif"
+  };
+
+  const heroStyle = {
+    textAlign: "center",
+    maxWidth: "750px",
+    margin: "auto"
+  };
+
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "30px",
+    maxWidth: "900px",
+    margin: "50px auto"
+  };
+
+  const cardStyle = {
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: "18px",
+    padding: "35px",
+    textAlign: "center",
+    backdropFilter: "blur(12px)",
+    transition: "0.3s ease",
+    cursor: "pointer"
+  };
+
+  const iconStyle = (color) => ({
+    fontSize: "55px",
+    marginBottom: "15px",
+    color
+  });
+
+  const stepBadge = {
+    display: "inline-block",
+    marginTop: "15px",
+    fontSize: "12px",
+    padding: "5px 12px",
+    borderRadius: "999px",
+    background: "rgba(56, 189, 248, 0.15)",
+    color: "#38bdf8"
+  };
+
+  const buttonStyle = {
+    background: "linear-gradient(135deg, #38bdf8, #2563eb)",
+    border: "none",
+    padding: "14px 32px",
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "white",
+    borderRadius: "12px",
+    cursor: "pointer",
+    transition: "0.3s ease",
+    letterSpacing: "0.5px"
+  };
+
   return (
-    <div className='container-fluid' style={{ height: '80vh' }}>
-      <h2 className='text-center' style={{ marginTop: '80px' }}>Create a job-winning Resume in minutes</h2>
-      <div className="row mt-5" >
-        <div className="col-md-6">
-          <div className='border rounded shadow m-5 d-flex align-items-center justify-content-center flex-column' style={{ height: '250px' }}>
-            <IoMdDocument className='text-primary fs-1 mb-5 ' />
-            <h4>Add Your Information</h4>
-            <p>Add Pre-Written example to Each Section</p>
-            <h5>Step 1</h5>
+    <div style={containerStyle}>
 
-          </div>
+
+      <div style={heroStyle}>
+        <h1 style={{ fontSize: "40px", fontWeight: "700" }}>
+          Create a job-winning resume in minutes
+        </h1>
+        <p style={{ color: "#94a3b8", fontSize: "15px", lineHeight: "1.6" }}>
+          Build ATS-friendly resumes with a clean, guided experience.
+        </p>
+      </div>
+
+  
+      <div style={gridStyle}>
+
+    
+        <div style={cardStyle}>
+          <IoMdDocument style={iconStyle("#38bdf8")} />
+          <h3>Add Your Information</h3>
+          <p style={{ color: "#94a3b8", fontSize: "14px" }}>
+            Fill structured sections with smart suggestions
+          </p>
+          <span style={stepBadge}>Step 1</span>
         </div>
-        <div className="col-md-6">
-          <div className='border rounded shadow m-5 d-flex align-items-center justify-content-center flex-column' style={{ height: '250px' }}>
-            <IoIosDownload className='text-danger fs-1 mb-5 ' />
-            <h4>Download Your Resume</h4>
-            <p>Download and start applying</p>
-            <h5>Step 2</h5>
 
-          </div>
+     
+        <div style={cardStyle}>
+          <IoIosDownload style={iconStyle("#fb7185")} />
+          <h3>Download Resume</h3>
+          <p style={{ color: "#94a3b8", fontSize: "14px" }}>
+            Export instantly as a professional PDF
+          </p>
+          <span style={stepBadge}>Step 2</span>
         </div>
-
 
       </div>
-      <div className='text-center mb-5'>
-        <Link to={'/form'}>
-          <button className='btn btn-dark text-light text-center'>
-            MAKE YOUR RESUME
+
+      <div style={{ textAlign: "center", marginTop: "40px" }}>
+        <Link to="/form">
+          <button style={buttonStyle}onMouseOver={(e) => {e.target.style.transform = "scale(1.05)";e.target.style.boxShadow = "0 12px 35px rgba(56,189,248,0.3)";}}onMouseOut={(e) => {e.target.style.transform = "scale(1)";e.target.style.boxShadow = "none";}}>MAKE YOUR RESUME
           </button>
         </Link>
       </div>
 
     </div>
-  )
+  );
 }
 
-export default ResumeGenerator
+export default ResumeGenerator;
